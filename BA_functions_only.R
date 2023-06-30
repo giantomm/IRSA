@@ -6,6 +6,214 @@ library(xts)
 library(quantmod)
 library(lubridate)
 
+empty_institution <- function(name){
+  bank <- createInstitution(name)
+  
+  bank$Assets$ShortTermAssets$AddChild("Cash and cash equivalents")
+  bank$Assets$ShortTermAssets$AddChild("AFS securities")
+  bank$Assets$ShortTermAssets$AddChild("HTM securities")
+  
+  bank$Assets$LongTermAssets$AddChild("Non-marketable securities")
+  bank$Assets$LongTermAssets$AddChild("Loans")
+  bank$Assets$LongTermAssets$AddChild("Other assets")
+  
+  bank$Assets$FixedAssets$AddChild("Premises and equipment")
+  bank$Assets$FixedAssets$AddChild("Goodwill")
+  bank$Assets$FixedAssets$AddChild("Other intangible assets")
+  bank$Assets$FixedAssets$AddChild("Lease right-of-use assets")
+  
+  bank$Liabilities$ShortTermLiabilities$AddChild("Demand deposits")
+  bank$Liabilities$ShortTermLiabilities$AddChild("Deposits")
+  bank$Liabilities$ShortTermLiabilities$AddChild("Short-term borrowings")
+  
+  bank$Liabilities$LongTermLiabilities$AddChild("Lease liabilities")
+  bank$Liabilities$LongTermLiabilities$AddChild("Long-term debt")
+  bank$Liabilities$LongTermLiabilities$AddChild("Other liabilities")
+  
+  return(bank)
+}
+
+
+simulation_buckets <- function(inst, RFb, RF1, RF2, StartDate, EndDate){
+  bankb <- events(object = inst, riskFactors = RFb)
+  bank1 <- events(object = inst, riskFactors = RF1)
+  bank2 <- events(object = inst, riskFactors = RF2)
+  
+  
+  # Balance Sheets 2022 
+  
+  # Date range in timebuckets (tb)
+  t0 <- as.character(as.Date(StartDate))
+  tn <- as.character(as.Date(EndDate))
+  
+  n <- yearFraction(t0, tn)
+  t0Year <- as.numeric(substr(t0,1,4))
+  tnYear <- as.numeric(substr(tn,1,4))
+  by <- timeSequence(t0, by="1 years", length.out=n+2)
+  tb <- timeBuckets(by, bucketLabs=t0Year:tnYear, 
+                    breakLabs=substr(as.character(by),3,10))
+  
+  marketb_2022 <- value(bankb, tb, type = 'market', method = DcEngine(RFConn(RFb$riskfactors[[1]])), digits = 2)
+  market1_2022 <- value(bank1, tb, type = 'market', method = DcEngine(RFConn(RF1$riskfactors[[1]])), digits = 2)
+  market2_2022 <- value(bank2, tb, type = 'market', method = DcEngine(RFConn(RF2$riskfactors[[1]])), digits = 2)
+  
+  nominalb_2022 <- value(bankb, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal1_2022 <- value(bank1, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal2_2022 <- value(bank2, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  
+  incomeb_2022 <- income(bankb, tb, "marginal")
+  income1_2022 <- income(bank1, tb, "marginal")
+  income2_2022 <- income(bank2, tb, "marginal")
+  
+  # Balance Sheets 2023 -----------------------------------------------------
+  
+  # Date range in timebuckets (tb)
+  t0 <- as.character(as.Date(StartDate) + years(1))
+  tn <- as.character(as.Date(EndDate))
+  
+  n <- yearFraction(t0, tn)
+  t0Year <- as.numeric(substr(t0,1,4))
+  tnYear <- as.numeric(substr(tn,1,4))
+  by <- timeSequence(t0, by="1 years", length.out=n+2)
+  tb <- timeBuckets(by, bucketLabs=t0Year:tnYear, 
+                    breakLabs=substr(as.character(by),3,10))
+  
+  marketb_2023 <- value(bankb, tb, type = 'market', method = DcEngine(RFConn(RFb$riskfactors[[2]])), digits = 2)
+  market1_2023 <- value(bank1, tb, type = 'market', method = DcEngine(RFConn(RF1$riskfactors[[2]])), digits = 2)
+  market2_2023 <- value(bank2, tb, type = 'market', method = DcEngine(RFConn(RF2$riskfactors[[2]])), digits = 2)
+  
+  nominalb_2023 <- value(bankb, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal1_2023 <- value(bank1, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal2_2023 <- value(bank2, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  
+  incomeb_2023 <- income(bankb, tb, "marginal")
+  income1_2023 <- income(bank1, tb, "marginal")
+  income2_2023 <- income(bank2, tb, "marginal")
+  # Balance Sheets 2024 -----------------------------------------------------
+  
+  # Date range in timebuckets (tb)
+  t0 <- as.character(as.Date(StartDate) + years(2))
+  tn <- as.character(as.Date(EndDate))
+  
+  n <- yearFraction(t0, tn)
+  t0Year <- as.numeric(substr(t0,1,4))
+  tnYear <- as.numeric(substr(tn,1,4))
+  by <- timeSequence(t0, by="1 years", length.out=n+2)
+  tb <- timeBuckets(by, bucketLabs=t0Year:tnYear, 
+                    breakLabs=substr(as.character(by),3,10))
+  
+  marketb_2024 <- value(bankb, tb, type = 'market', method = DcEngine(RFConn(RFb$riskfactors[[3]])), digits = 2)
+  market1_2024 <- value(bank1, tb, type = 'market', method = DcEngine(RFConn(RF1$riskfactors[[3]])), digits = 2)
+  market2_2024 <- value(bank2, tb, type = 'market', method = DcEngine(RFConn(RF2$riskfactors[[3]])), digits = 2)
+  
+  nominalb_2024 <- value(bankb, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal1_2024 <- value(bank1, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal2_2024 <- value(bank2, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  
+  incomeb_2024 <- income(bankb, tb, "marginal")
+  income1_2024 <- income(bank1, tb, "marginal")
+  income2_2024 <- income(bank2, tb, "marginal")
+  # Balance Sheets 2025 -----------------------------------------------------
+  
+  # Date range in timebuckets (tb)
+  t0 <- as.character(as.Date(StartDate) + years(3))
+  tn <- as.character(as.Date(EndDate))
+  
+  n <- yearFraction(t0, tn)
+  t0Year <- as.numeric(substr(t0,1,4))
+  tnYear <- as.numeric(substr(tn,1,4))
+  by <- timeSequence(t0, by="1 years", length.out=n+2)
+  tb <- timeBuckets(by, bucketLabs=t0Year:tnYear, 
+                    breakLabs=substr(as.character(by),3,10))
+  
+  marketb_2025 <- value(bankb, tb, type = 'market', method = DcEngine(RFConn(RFb$riskfactors[[4]])), digits = 2)
+  market1_2025 <- value(bank1, tb, type = 'market', method = DcEngine(RFConn(RF1$riskfactors[[4]])), digits = 2)
+  market2_2025 <- value(bank2, tb, type = 'market', method = DcEngine(RFConn(RF2$riskfactors[[4]])), digits = 2)
+  
+  nominalb_2025 <- value(bankb, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal1_2025 <- value(bank1, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal2_2025 <- value(bank2, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  
+  incomeb_2025 <- income(bankb, tb, "marginal")
+  income1_2025 <- income(bank1, tb, "marginal")
+  income2_2025 <- income(bank2, tb, "marginal")
+  
+  # Balance Sheets 2026 -----------------------------------------------------
+  
+  # Date range in timebuckets (tb)
+  t0 <- as.character(as.Date(StartDate) + years(4))
+  tn <- as.character(as.Date(EndDate))
+  
+  n <- yearFraction(t0, tn)
+  t0Year <- as.numeric(substr(t0,1,4))
+  tnYear <- as.numeric(substr(tn,1,4))
+  by <- timeSequence(t0, by="1 years", length.out=n+2)
+  tb <- timeBuckets(by, bucketLabs=t0Year:tnYear, 
+                    breakLabs=substr(as.character(by),3,10))
+  
+  marketb_2026 <- value(bankb, tb, type = 'market', method = DcEngine(RFConn(RFb$riskfactors[[5]])), digits = 2)
+  market1_2026 <- value(bank1, tb, type = 'market', method = DcEngine(RFConn(RF1$riskfactors[[5]])), digits = 2)
+  market2_2026 <- value(bank2, tb, type = 'market', method = DcEngine(RFConn(RF2$riskfactors[[5]])), digits = 2)
+  
+  nominalb_2026 <- value(bankb, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal1_2026 <- value(bank1, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal2_2026 <- value(bank2, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  
+  incomeb_2026 <- income(bankb, tb, "marginal")
+  income1_2026 <- income(bank1, tb, "marginal")
+  income2_2026 <- income(bank2, tb, "marginal")
+  
+  # Balance Sheets 2027 -----------------------------------------------------
+  
+  # Date range in timebuckets (tb)
+  t0 <- as.character(as.Date(StartDate) + years(5))
+  tn <- as.character(as.Date(EndDate))
+  
+  n <- yearFraction(t0, tn)
+  t0Year <- as.numeric(substr(t0,1,4))
+  tnYear <- as.numeric(substr(tn,1,4))
+  by <- timeSequence(t0, by="1 years", length.out=n+2)
+  tb <- timeBuckets(by, bucketLabs=t0Year:tnYear, 
+                    breakLabs=substr(as.character(by),3,10))
+  
+  marketb_2027 <- value(bankb, tb, type = 'market', method = DcEngine(RFConn(RFb$riskfactors[[6]])), digits = 2)
+  market1_2027 <- value(bank1, tb, type = 'market', method = DcEngine(RFConn(RF1$riskfactors[[6]])), digits = 2)
+  market2_2027 <- value(bank2, tb, type = 'market', method = DcEngine(RFConn(RF2$riskfactors[[6]])), digits = 2)
+  
+  nominalb_2027 <- value(bankb, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal1_2027 <- value(bank1, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  nominal2_2027 <- value(bank2, tb, type = 'nominal', method = DcEngine(), digits = 2)
+  
+  # Lists for Balance Sheets of each Scenario -------------------------------
+  marketb_list <- list(marketb_2022, marketb_2023, marketb_2024, marketb_2025,
+                       marketb_2026, marketb_2027)
+  
+  market1_list <- list(market1_2022, market1_2023, market1_2024, market1_2025,
+                       market1_2026, market1_2027)
+  
+  market2_list <- list(market2_2022, market2_2023, market2_2024, market2_2025,
+                       market2_2026, market2_2027)
+  
+  nominalb_list <- list(nominalb_2022, nominalb_2023, nominalb_2024,
+                        nominalb_2025, nominalb_2026, nominalb_2027)
+  
+  nominal1_list <- list(nominal1_2022, nominal1_2023, nominal1_2024,
+                        nominal1_2025, nominal1_2026, nominal1_2027)
+  
+  nominal2_list <- list(nominal2_2022, nominal2_2023, nominal2_2024,
+                        nominal2_2025, nominal2_2026, nominal2_2027)
+  
+  # Adjusted Balance Sheets
+  marketb <- merge_bs(marketb_list)
+  market1 <- merge_bs(market1_list)
+  market2 <- merge_bs(market2_list)
+  
+  nominalb <- merge_bs(nominalb_list)
+  nominal1 <- merge_bs(nominal1_list)
+  nominal2 <- merge_bs(nominal2_list)
+  return(list(marketb, market1, market2, nominalb, nominal1, nominal2, incomeb_2022))
+}
+
 retrieve_rates <- function(){
   # Set the FRED API key
   fred_api_key <- "c26226691feffdfaced45c83539150ca"
