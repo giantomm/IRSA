@@ -13,6 +13,8 @@ library(data.tree)
 library(utils)
 library(glue)
 library(tidyverse)
+library(xts)
+library(quantmod)
 library("FRSA")
 
 # Define object styling using custom CSS
@@ -92,5 +94,40 @@ div[data-value='Risk Analysis'] {
 
 #str_cancel_rename_node {
   margin-top: 28px !important;
+}
+
+#incomeStatement {
+  width: 100%;
+  overflow-x: scroll;
+}
+
+#Bal_IFRS {
+  width: 100%;
+  overflow-x: scroll;
+}
+
+#Bal_Market {
+  width: 100%;
+  overflow-x: scroll;
+}
+
+#Max_Loss {
+  width: 100%;
+  overflow-x: scroll;
+}
+
+#BS_Withdrawals {
+  width: 100%;
+  overflow-x: scroll;
+}
+
+#NI_Withdrawals {
+  width: 100%;
+  overflow-x: scroll;
+}
+
+#Ratios_Withdrawals {
+  width: 100%;
+  overflow-x: scroll;
 }
 "
