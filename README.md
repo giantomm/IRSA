@@ -5,3 +5,6 @@ The app and thesis authors are students from the Zurich University of Applied Sc
 
 ## Purpose
 This repository holds a Shiny App and the R scripts used to simulate the financial statements of SVB. The app should allow users to play around and try the interest rate scenarios for their own financial institution(s).
+
+## Link to App
+The app can be run here: https://giantom.shinyapps.io/IRSA/
