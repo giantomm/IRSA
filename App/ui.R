@@ -120,9 +120,10 @@ fluidPage(
               br(),
               h5("Please confirm your selection by hitting the 'Save settings' button. If you wish to change the date, simply hit the button with a different date again."),
               br(),
-              dateInput("scenarioDate", "Select Date", value = Sys.Date() - months(1),
+              dateInput("scenarioDate", "Select Date", value = "2022-01-01",
                         min = Sys.Date() - months (1) - years(5), max = Sys.Date() - months(1)
                         ),
+              h5("If you wish to load SVB's data, the", strong("Applied Date"), "must be 2022-01-01!"),
               p(strong("Note:"), "The program will then automatically select the first date of the month you chose as the simulation works with monthly data."),
               p("The", strong("Applied Date"), "for the scenarios is:"),
               uiOutput("appliedDate"),
